@@ -15,20 +15,6 @@ public struct Tetromino {
         return rotation.rawValue
     }
 
-    struct Coordinate: Equatable, Codable {
-        var x: Int = 0
-        var y: Int = 0
-        init(x: Int = 0, y: Int = 0) {
-            self.x = x
-            self.y = y
-        }
-        init(_ x: Int = 0, _ y: Int = 0) {
-            self.x = x
-            self.y = y
-        }
-        static var zero: Coordinate { return Coordinate() }
-    }
-
     /// positions relative to 0x0 at lower left
     struct Coordinates: Equatable, Codable {
         var a: Coordinate

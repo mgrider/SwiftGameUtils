@@ -110,4 +110,22 @@ final class SwiftGameUtilsTests: XCTestCase {
         XCTAssertEqual(point.y, -1)
     }
 
+    func testToString() {
+        let game = GridGame()
+        let gameString = "\(game)"
+        let result = """
+GridGame (GridGame) 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+Game Over: false, Paused: false
+"""
+        XCTAssertEqual(gameString, "\(result)")
+    }
+
 }

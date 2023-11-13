@@ -26,8 +26,8 @@ public struct GridGame: Codable, CustomStringConvertible {
 
     // MARK: Date & time & game duration (mostly still TODO)
 
-    /// The start datetime of the game.
-    var gameTimeStartDate: Date
+    /// The start `Date` of the game.
+    var gameStartDate: Date
 
     // MARK: state properties
 
@@ -35,10 +35,10 @@ public struct GridGame: Codable, CustomStringConvertible {
     public var stateDefault: Int
 
     /// The value representing an empty game state
-    public var stateEmpty = -1
+    public var stateEmpty: Int
 
     /// game states are between 0 and gridMaxStateInt
-    public var stateMax = 1
+    public var stateMax: Int
 
     /// A multidimensional array representing the state of each grid space
     private(set) var states = [[Int]]()
@@ -68,16 +68,21 @@ public struct GridGame: Codable, CustomStringConvertible {
 
     // MARK: Initializers & setup
 
-    /// Initializer for the GGM_Model instance.
-    public init(gridWidth width: Int = 8,
-                gridHeight height: Int = 8,
-                stateDefault newStateDefault: Int = -1,
-                startDate: Date = Date()) {
-
-        gameTimeStartDate = startDate
-        gridWidth = width
-        gridHeight = height
-        stateDefault = newStateDefault
+    /// Initializer
+    public init(
+        gridWidth: Int = 8,
+        gridHeight: Int = 8,
+        stateDefault: Int = -1,
+        stateEmpty: Int = -1,
+        stateMax: Int = 2,
+        startDate: Date = Date()
+    ) {
+        self.gridWidth = gridWidth
+        self.gridHeight = gridHeight
+        self.stateDefault = stateDefault
+        self.stateEmpty = stateEmpty
+        self.stateMax = stateMax
+        self.gameStartDate = startDate
         setupGrid()
     }
 
@@ -112,6 +117,11 @@ public struct GridGame: Codable, CustomStringConvertible {
         states[y][x] = state
     }
 
+    /// set a single state at a given Coordinate
+    mutating public func setState(atCoordinate coordinate: Coordinate, to state: Int) {
+        setState(atX: coordinate.x, andY: coordinate.y, to: state)
+    }
+
     /// set a single state when only the index is known
     mutating public func setState(atIndex index: Int, to state: Int) {
         setState(atPoint: pointFor(index: index), to: state)
@@ -121,6 +131,17 @@ public struct GridGame: Codable, CustomStringConvertible {
     mutating public func setState(atPoint point: Point, to state: Int) {
         setState(atX: point.x, andY: point.y, to: state)
     }
+
+    /// set all states to this new value
+    mutating public func setAllStates(to state: Int) {
+        for y in 0..<gridHeight {
+            for x in 0..<gridWidth {
+                states[y][x] = state
+            }
+        }
+    }
+
+    // MARK: randomization
 
     /// get a random possible state int between 0 and `stateMax`
     func randomStateInt() -> Int {
@@ -136,16 +157,12 @@ public struct GridGame: Codable, CustomStringConvertible {
         }
     }
 
-    /// set all states to this new value
-    mutating public func setAllStates(to state: Int) {
-        for y in 0..<gridHeight {
-            for x in 0..<gridWidth {
-                states[y][x] = state
-            }
-        }
-    }
-
     // MARK: getting state
+
+    /// get the state from a `Coordinate`
+    public func stateAt(coordinate: Coordinate) -> Int? {
+        return stateAt(x: coordinate.x, y: coordinate.y)
+    }
 
     /// get the state from an index
     public func stateAt(index: Int) -> Int? {
@@ -179,7 +196,67 @@ public struct GridGame: Codable, CustomStringConvertible {
         }
     }
 
-    // MARK: index to point
+    // MARK: unwrapped state Ints
+
+    /// get the state from a `Coordinate`
+    public func unwrappedStateAt(coordinate: Coordinate) -> Int {
+        return unwrappedStateAt(x: coordinate.x, y: coordinate.y)
+    }
+
+    /// get the state from an index
+    public func unwrappedStateAt(index: Int) -> Int {
+        return unwrappedStateAt(point: pointFor(index: index))
+    }
+
+    /// get the state at a given point
+    public func unwrappedStateAt(point: Point) ->Int {
+        return unwrappedStateAt(x: point.x, y: point.y)
+    }
+
+    /// get a single state value
+    public func unwrappedStateAt(x: Int, y: Int) -> Int {
+        guard x >= 0, y >= 0, x < gridWidth, y < gridHeight else {
+            return stateEmpty
+        }
+        return states[y][x]
+    }
+
+    /// get a state in a position one unit away in a given direction
+    public func unwrappedState(inDirection: Direction, fromX x: Int, andY y: Int) -> Int {
+        switch inDirection {
+        case .up:
+            return unwrappedStateAt(x: x, y: y-1)
+        case .down:
+            return unwrappedStateAt(x: x, y: y+1)
+        case .left:
+            return unwrappedStateAt(x: x-1, y: y)
+        case .right:
+            return unwrappedStateAt(x: x+1, y: y)
+        }
+    }
+
+    // MARK: isEmpty
+
+    public func isEmptyAt(x: Int, y: Int) -> Bool {
+        return unwrappedStateAt(x: x, y: y) == stateEmpty
+    }
+
+    // MARK: index point coordinate conversion
+
+    /// Get a `Coordinate` from an index.
+    public func coordinateFor(index: Int) -> Coordinate {
+        guard index >= 0, index < gridCount else {
+            return Coordinate(x: -1, y: -1)
+        }
+        let y = index / gridHeight
+        let x = index % gridHeight
+        return Coordinate(x: x, y: y)
+    }
+
+    /// Get an index from a `Coordinate`
+    public func indexFor(coordinate: Coordinate) -> Int {
+        return indexFor(point: (coordinate.x, coordinate.y))
+    }
 
     /// Get an index from a point
     public func indexFor(point: Point) -> Int {
@@ -211,7 +288,7 @@ public struct GridGame: Codable, CustomStringConvertible {
 
     /// `toString` for debugging
     func toString() -> String {
-        var string = "GGM_Game (\(type(of: self))) \n"
+        var string = "GridGame (\(type(of: self))) \n"
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
                 string += "\(String(describing: states[y][x]).padding(toLength: 2, withPad: " ", startingAt: 0)), "
