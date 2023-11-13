@@ -37,7 +37,7 @@ public struct GridGame: Codable, CustomStringConvertible {
     /// The value representing an empty game state
     public var stateEmpty: Int
 
-    /// game states are between 0 and gridMaxStateInt
+    /// game states are between 0 and gridMaxStateInt. This is really only used for random states.
     public var stateMax: Int
 
     /// A multidimensional array representing the state of each grid space
