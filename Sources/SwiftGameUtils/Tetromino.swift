@@ -17,10 +17,10 @@ public struct Tetromino {
 
     /// positions relative to 0x0 at lower left
     public struct Coordinates: Equatable, Codable {
-        var a: Coordinate
-        var b: Coordinate
-        var c: Coordinate
-        var d: Coordinate
+        public var a: Coordinate
+        public var b: Coordinate
+        public var c: Coordinate
+        public var d: Coordinate
         init(
             a: Coordinate = .zero,
             b: Coordinate = .zero,
@@ -43,17 +43,17 @@ public struct Tetromino {
             self.c = .init(x: cx, y: cy)
             self.d = .init(x: dx, y: dy)
         }
-        func contains(coord: Coordinate) -> Bool {
+        public func contains(coord: Coordinate) -> Bool {
             if (a == coord || b == coord || c == coord || d == coord) {
                 return true
             } else {
                 return false
             }
         }
-        func toString() -> String {
+        public func toString() -> String {
             return "Coordinates({\(a.x),\(a.y)}{\(b.x),\(b.y)}{\(c.x),\(c.y)}{\(d.x),\(d.y)})"
         }
-        static var zero: Coordinates { return Coordinates() }
+        public static var zero: Coordinates { return Coordinates() }
     }
     public var position: Coordinates
 
