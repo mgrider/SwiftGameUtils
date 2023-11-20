@@ -2,21 +2,21 @@ import Foundation
 
 public struct Tetromino {
 
-    enum Shape: Int {
+    public enum Shape: Int {
         case J, L, T, I, Z, S, O, None
     }
-    var shape: Shape
+    public var shape: Shape
 
-    enum Rotation: Int {
+    public enum Rotation: Int {
         case r0, r1, r2, r3
     }
-    var rotation: Rotation = .r0
-    var rotationCount: Int {
+    public var rotation: Rotation = .r0
+    public var rotationCount: Int {
         return rotation.rawValue
     }
 
     /// positions relative to 0x0 at lower left
-    struct Coordinates: Equatable, Codable {
+    public struct Coordinates: Equatable, Codable {
         var a: Coordinate
         var b: Coordinate
         var c: Coordinate
@@ -55,7 +55,7 @@ public struct Tetromino {
         }
         static var zero: Coordinates { return Coordinates() }
     }
-    var position: Coordinates
+    public var position: Coordinates
 
     init(
         shape: Shape,
@@ -67,11 +67,11 @@ public struct Tetromino {
         self.position = position
     }
 
-    static func coordinatesForTypeAndRotation(_ s: Shape, _ rotation: Int) ->  Coordinates {
+    public static func coordinatesForTypeAndRotation(_ s: Shape, _ rotation: Int) ->  Coordinates {
         return Tetromino.coordinatesForTypeAndRotationWhileCentered(s, rotation)
     }
 
-    static func coordinatesForTypeAndRotationWhileCentered(_ s: Shape, _ rotationCount: Int) -> Coordinates {
+    public static func coordinatesForTypeAndRotationWhileCentered(_ s: Shape, _ rotationCount: Int) -> Coordinates {
         guard let rotation = Rotation(rawValue: rotationCount) else {
             return Coordinates(0, 0, 0, 0, 0, 0, 0, 0)
         }
@@ -159,7 +159,7 @@ public struct Tetromino {
         }
     }
 
-    static func coordinatesForTypeAndRotationLeftJustified(
+    public static func coordinatesForTypeAndRotationLeftJustified(
         _ s: Shape,
         _ rotationCount: Int
     ) -> Coordinates {
@@ -234,7 +234,7 @@ public struct Tetromino {
         }
     }
 
-    static func rotateCoordinates(
+    public static func rotateCoordinates(
         coordinate: Coordinates,
         shape s: Shape,
         originalRotation: Int,
@@ -257,7 +257,7 @@ public struct Tetromino {
         return added
     }
 
-    static func addCoordinates(
+    public static func addCoordinates(
         _ augend: Coordinates,
         _ addend: Coordinates
     ) -> Coordinates {
@@ -273,7 +273,7 @@ public struct Tetromino {
         return sum
     }
 
-    static func subtractCoordinates(
+    public static func subtractCoordinates(
         _ minuend: Coordinates,
         _ subtrahend: Coordinates
     ) -> Coordinates {
@@ -289,7 +289,7 @@ public struct Tetromino {
         return difference
     }
 
-    static func columnAndRowCountsForShapeAndRotation(
+    public static func columnAndRowCountsForShapeAndRotation(
         _ s: Shape,
         _ rotationCount: Int
     ) -> Coordinate {
