@@ -3,19 +3,6 @@ import Foundation
 /// Model struct for game state data.
 public struct GridGame: Codable, CustomStringConvertible {
 
-    // MARK: Sub Types
-
-    /// For relating positions to one another.
-    public enum Direction {
-        case up
-        case down
-        case left
-        case right
-    }
-
-    /// Encapsulation of x,y `Int` values.
-    public typealias Point = (x: Int, y: Int)
-
     // MARK: convenience properties
 
     /// Whether or not the game is over.
@@ -35,13 +22,14 @@ public struct GridGame: Codable, CustomStringConvertible {
     public var stateDefault: Int
 
     /// The value representing an empty game state
+    /// Note that this cannot be nil. Use `isValidCoordinate()` to check for out-of-bounds coordinates.
     public var stateEmpty: Int
 
-    /// game states are between 0 and gridMaxStateInt. This is really only used for random states.
+    /// game states are between `0` and `stateMax`. This is really used for random state generation.
     public var stateMax: Int
 
-    /// A multidimensional array representing the state of each grid space
-    private(set) var states = [[Int]]()
+    /// A dictionary representing the state of each grid space
+    private(set) var states: [Coordinate: Int] = [:]
 
     // MARK: grid properties
 
@@ -66,6 +54,10 @@ public struct GridGame: Codable, CustomStringConvertible {
         }
     }
 
+    // MARK: coordinates
+
+    private(set) var allCoordinates = [Coordinate]()
+
     // MARK: Initializers & setup
 
     /// Initializer
@@ -89,8 +81,11 @@ public struct GridGame: Codable, CustomStringConvertible {
     /// This re-creates the "grid", which is essentially the multidimensional state array. Called on init.
     mutating private func setupGrid() {
         states.removeAll()
-        for _ in 0..<gridHeight {
-            states.append(Array(repeating: stateDefault, count: gridWidth))
+        for y in 0..<gridHeight {
+            for x in 0..<gridWidth {
+                let coordinate = Coordinate(x: x, y: y)
+                states[coordinate] = stateDefault
+            }
         }
     }
 
@@ -98,52 +93,57 @@ public struct GridGame: Codable, CustomStringConvertible {
     mutating private func resizeGrid() {
         let oldStates = states
         setupGrid()
-        for y in 0..<oldStates.count {
-            for x in 0..<oldStates[y].count {
-                if y < gridHeight && x < gridWidth {
-                    states[y][x] = oldStates[y][x]
-                }
+        for coordinate in oldStates.keys {
+            if states[coordinate] != nil {
+                states[coordinate] = oldStates[coordinate]
             }
         }
+    }
+
+    // MARK: checking for valid coordinates
+
+    public func isValidCoordinate(_ coordinate: Coordinate) -> Bool {
+        return coordinate.x >= 0 &&
+               coordinate.x < gridWidth &&
+               coordinate.y >= 0 &&
+               coordinate.y < gridHeight
     }
 
     // MARK: setting state
 
     /// set a single state when x and y are known
     mutating public func setState(atX x: Int, andY y: Int, to state: Int) {
-        guard x >= 0, x < gridWidth, y >= 0, y < gridHeight else {
-            return
-        }
-        states[y][x] = state
+        setState(atCoordinate: Coordinate(x: x, y: y), to: state)
     }
 
     /// set a single state at a given Coordinate
     mutating public func setState(atCoordinate coordinate: Coordinate, to state: Int) {
-        setState(atX: coordinate.x, andY: coordinate.y, to: state)
+        guard coordinate.x >= 0,
+              coordinate.x < gridWidth,
+              coordinate.y >= 0,
+              coordinate.y < gridHeight else {
+            return
+        }
+        states[coordinate] = state
     }
 
     /// set a single state when only the index is known
     mutating public func setState(atIndex index: Int, to state: Int) {
-        setState(atPoint: pointFor(index: index), to: state)
-    }
-
-    /// set a single state at a given Point
-    mutating public func setState(atPoint point: Point, to state: Int) {
-        setState(atX: point.x, andY: point.y, to: state)
+        setState(atCoordinate: coordinateFor(index: index), to: state)
     }
 
     /// set all states to this new value
     mutating public func setAllStates(to state: Int) {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
-                states[y][x] = state
+                states[Coordinate(x: x, y: y)] = state
             }
         }
     }
 
     // MARK: randomization
 
-    /// get a random possible state int between 0 and `stateMax`
+    /// get a random possible state int between `0` and `stateMax`
     func randomStateInt() -> Int {
         return Int.random(in: 0...stateMax)
     }
@@ -152,7 +152,7 @@ public struct GridGame: Codable, CustomStringConvertible {
     mutating public func randomizeStates() {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
-                states[y][x] = randomStateInt()
+                states[Coordinate(x: x, y: y)] = randomStateInt()
             }
         }
     }
@@ -160,26 +160,23 @@ public struct GridGame: Codable, CustomStringConvertible {
     // MARK: getting state
 
     /// get the state from a `Coordinate`
-    public func stateAt(coordinate: Coordinate) -> Int? {
-        return stateAt(x: coordinate.x, y: coordinate.y)
+    public func stateAt(coordinate: Coordinate) -> Int {
+        guard isValidCoordinate(coordinate),
+              let value = states[coordinate] else {
+            return stateEmpty
+        }
+        return value
     }
 
     /// get the state from an index
-    public func stateAt(index: Int) -> Int? {
-        return stateAt(point: pointFor(index: index))
-    }
-
-    /// get the state at a given point
-    public func stateAt(point: Point) ->Int? {
-        return stateAt(x: point.x, y: point.y)
+    public func stateAt(index: Int) -> Int {
+        return stateAt(coordinate: coordinateFor(index: index))
     }
 
     /// get a single state value
-    public func stateAt(x: Int, y: Int) -> Int? {
-        guard x >= 0, y >= 0, x < gridWidth, y < gridHeight else {
-            return nil
-        }
-        return states[y][x]
+    public func stateAt(x: Int, y: Int) -> Int {
+        let coordinate = Coordinate(x: x, y: y)
+        return stateAt(coordinate: coordinate)
     }
 
     /// get a state in a position one unit away in a given direction
@@ -196,49 +193,18 @@ public struct GridGame: Codable, CustomStringConvertible {
         }
     }
 
-    // MARK: unwrapped state Ints
-
-    /// get the state from a `Coordinate`
-    public func unwrappedStateAt(coordinate: Coordinate) -> Int {
-        return unwrappedStateAt(x: coordinate.x, y: coordinate.y)
-    }
-
-    /// get the state from an index
-    public func unwrappedStateAt(index: Int) -> Int {
-        return unwrappedStateAt(point: pointFor(index: index))
-    }
-
-    /// get the state at a given point
-    public func unwrappedStateAt(point: Point) ->Int {
-        return unwrappedStateAt(x: point.x, y: point.y)
-    }
-
-    /// get a single state value
-    public func unwrappedStateAt(x: Int, y: Int) -> Int {
-        guard x >= 0, y >= 0, x < gridWidth, y < gridHeight else {
-            return stateEmpty
-        }
-        return states[y][x]
-    }
-
-    /// get a state in a position one unit away in a given direction
-    public func unwrappedState(inDirection: Direction, fromX x: Int, andY y: Int) -> Int {
-        switch inDirection {
-        case .up:
-            return unwrappedStateAt(x: x, y: y-1)
-        case .down:
-            return unwrappedStateAt(x: x, y: y+1)
-        case .left:
-            return unwrappedStateAt(x: x-1, y: y)
-        case .right:
-            return unwrappedStateAt(x: x+1, y: y)
-        }
-    }
-
     // MARK: isEmpty
 
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
+    public func isEmptyAt(coordinate: Coordinate) -> Bool {
+        guard let state = states[coordinate] else { return false }
+        return state == stateEmpty
+    }
+
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
     public func isEmptyAt(x: Int, y: Int) -> Bool {
-        return unwrappedStateAt(x: x, y: y) == stateEmpty
+        let coordinate = Coordinate(x: x, y: y)
+        return isEmptyAt(coordinate: coordinate)
     }
 
     // MARK: index point coordinate conversion
@@ -253,28 +219,13 @@ public struct GridGame: Codable, CustomStringConvertible {
         return Coordinate(x: x, y: y)
     }
 
-    /// Get an index from a `Coordinate`
-    public func indexFor(coordinate: Coordinate) -> Int {
-        return indexFor(point: (coordinate.x, coordinate.y))
-    }
-
     /// Get an index from a point
-    public func indexFor(point: Point) -> Int {
-        guard point.x >= 0, point.x < gridWidth,
-              point.y >= 0, point.y < gridHeight else {
+    public func indexFor(coordinate: Coordinate) -> Int {
+        guard coordinate.x >= 0, coordinate.x < gridWidth,
+              coordinate.y >= 0, coordinate.y < gridHeight else {
             return -1
         }
-        return (point.y * gridHeight) + point.x
-    }
-
-    /// Get a Point from an index
-    public func pointFor(index: Int) -> Point {
-        guard index >= 0, index < gridCount else {
-            return Point(x: -1, y: -1)
-        }
-        let y = index / gridHeight
-        let x = index % gridHeight
-        return Point(x: x, y: y)
+        return (coordinate.y * gridHeight) + coordinate.x
     }
 
     // MARK: util
@@ -291,7 +242,8 @@ public struct GridGame: Codable, CustomStringConvertible {
         var string = "GridGame (\(type(of: self))) \n"
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
-                string += "\(String(describing: states[y][x]).padding(toLength: 2, withPad: " ", startingAt: 0)), "
+                let state = stateAt(x: x, y: y)
+                string += "\(String(describing: state).padding(toLength: 2, withPad: " ", startingAt: 0)), "
             }
             //            string += "\(String(describing: states[y]) \n"
             string += "\n"

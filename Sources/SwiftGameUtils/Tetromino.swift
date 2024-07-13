@@ -51,7 +51,7 @@ public struct Tetromino {
             }
         }
         public func toString() -> String {
-            return "Coordinates({\(a.x),\(a.y)}{\(b.x),\(b.y)}{\(c.x),\(c.y)}{\(d.x),\(d.y)})"
+            return "Tetromino.Coordinates({\(a.x),\(a.y)}{\(b.x),\(b.y)}{\(c.x),\(c.y)}{\(d.x),\(d.y)})"
         }
         public static var zero: Coordinates { return Coordinates() }
     }
