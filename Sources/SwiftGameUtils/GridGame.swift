@@ -56,7 +56,11 @@ public struct GridGame: Codable, CustomStringConvertible {
 
     // MARK: coordinates
 
-    private(set) var allCoordinates = [Coordinate]()
+    /// computed property for all the coordinates with states
+    public var allCoordinates: [Coordinate] {
+        let keys: [Coordinate] = states.keys.map { $0 }
+        return keys
+    }
 
     // MARK: Initializers & setup
 
@@ -102,6 +106,7 @@ public struct GridGame: Codable, CustomStringConvertible {
 
     // MARK: checking for valid coordinates
 
+    /// returns whether the given coordinate is within the bounds of our `gridWidth` and `gridHeight`
     public func isValidCoordinate(_ coordinate: Coordinate) -> Bool {
         return coordinate.x >= 0 &&
                coordinate.x < gridWidth &&

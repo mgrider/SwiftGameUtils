@@ -15,6 +15,15 @@ final class SwiftGameUtilsTests: XCTestCase {
         XCTAssertEqual(smallState.gridCount, 12)
     }
 
+    func testAllCoordinates() {
+        let state = GridGame()
+        let allCoordinates = state.allCoordinates
+        XCTAssertEqual(state.states.count, allCoordinates.count)
+        for coordinate in allCoordinates {
+            XCTAssertEqual(state.states[coordinate], state.stateAt(coordinate: coordinate))
+        }
+    }
+
     func testGridHeightAndWidthResizeGrid() {
         var state = GridGame()
         XCTAssertEqual(state.gridHeight, 8)

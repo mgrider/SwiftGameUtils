@@ -58,6 +58,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     // MARK: coordinates
 
+    /// computed property for all the coordinates with states
     public var allCoordinates: [Coordinate] {
         let keys: [Coordinate] = states.keys.map { $0 }
         return keys
@@ -107,6 +108,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     // MARK: checking for valid coordinates
 
+    /// returns whether the given coordinate is within the bounds of our `gridWidth` and `gridHeight`
     public func isValidCoordinate(_ coordinate: Coordinate) -> Bool {
         return coordinate.x >= 0 &&
         coordinate.x < gridWidth &&
@@ -148,12 +150,12 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     // MARK: randomization
 
-    /// get a random possible state int between `0` and `stateMax`
-    func randomStateInt() -> StateType {
+    /// get a random state from the initially provided array
+    public func randomStateInt() -> StateType {
         return statesPossibleRandom[Int.random(in: 0..<statesPossibleRandom.count)]
     }
 
-    /// completely randomize the grid states with values between `0` and `stateMax`
+    /// completely randomize the grid states with random values
     mutating public func randomizeStates() {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {

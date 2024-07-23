@@ -28,6 +28,14 @@ final class GenericGridGameTests: XCTestCase {
         XCTAssertEqual(subject.gridCount, 64)
     }
 
+    func testAllCoordinates() {
+        let allCoordinates = subject.allCoordinates
+        XCTAssertEqual(subject.states.count, allCoordinates.count)
+        for coordinate in allCoordinates {
+            XCTAssertEqual(subject.states[coordinate], subject.stateAt(coordinate: coordinate))
+        }
+    }
+
     func testGridHeightAndWidthResizeGrid() {
         XCTAssertEqual(subject.gridHeight, 8)
         XCTAssertEqual(subject.states.count, 64)
