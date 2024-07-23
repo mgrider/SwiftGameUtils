@@ -1,6 +1,8 @@
 import Foundation
 
-public struct Coordinate: Equatable, Hashable, Codable {
+public protocol CoordinateProtocol : Hashable, Codable, Equatable { }
+
+public struct Coordinate: CoordinateProtocol {
     public var x: Int = 0
     public var y: Int = 0
 
