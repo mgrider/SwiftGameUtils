@@ -149,7 +149,7 @@ public struct GridGame: Codable, CustomStringConvertible {
     // MARK: randomization
 
     /// get a random possible state int between `0` and `stateMax`
-    func randomStateInt() -> Int {
+    public func randomStateInt() -> Int {
         return Int.random(in: 0...stateMax)
     }
 
