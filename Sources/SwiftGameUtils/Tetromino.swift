@@ -4,6 +4,9 @@ public struct Tetromino {
 
     public enum Shape: Int {
         case J, L, T, I, Z, S, O, None
+        public static func random() -> Shape {
+            return [.J, .L, .T, .I, .Z, .S, .O][Int.random(in: 0..<7)]
+        }
     }
     public var shape: Shape
 
@@ -49,6 +52,18 @@ public struct Tetromino {
             } else {
                 return false
             }
+        }
+        public mutating func addToX(_ additive: Int) {
+            a.x += additive
+            b.x += additive
+            c.x += additive
+            d.x += additive
+        }
+        public mutating func addToY(_ additive: Int) {
+            a.y += additive
+            b.y += additive
+            c.y += additive
+            d.y += additive
         }
         public func toString() -> String {
             return "Tetromino.Coordinates({\(a.x),\(a.y)}{\(b.x),\(b.y)}{\(c.x),\(c.y)}{\(d.x),\(d.y)})"
