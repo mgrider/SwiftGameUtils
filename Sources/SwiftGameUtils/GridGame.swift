@@ -22,8 +22,12 @@ public struct GridGame: Codable, CustomStringConvertible {
     public var stateDefault: Int
 
     /// The value representing an empty game state
-    /// Note that this cannot be nil. Use `isValidCoordinate()` to check for out-of-bounds coordinates.
+    /// This will be the same as `stateDefault` unless set explicitly.
     public var stateEmpty: Int
+
+    /// The state that will be returned from `stateAt(...` functions when the requested coordinate is out of bounds.
+    /// Note: You can also use `isValidCoordinate()` to check for out-of-bounds coordinates.
+    public var stateInvalid: Int
 
     /// game states are between `0` and `stateMax`. This is really used for random state generation.
     public var stateMax: Int
@@ -70,6 +74,7 @@ public struct GridGame: Codable, CustomStringConvertible {
         gridHeight: Int = 8,
         stateDefault: Int = -1,
         stateEmpty: Int = -1,
+        stateInvalid: Int = -1,
         stateMax: Int = 2,
         startDate: Date = Date()
     ) {
@@ -77,6 +82,7 @@ public struct GridGame: Codable, CustomStringConvertible {
         self.gridHeight = gridHeight
         self.stateDefault = stateDefault
         self.stateEmpty = stateEmpty
+        self.stateInvalid = stateInvalid
         self.stateMax = stateMax
         self.gameStartDate = startDate
         setupGrid()
@@ -168,7 +174,7 @@ public struct GridGame: Codable, CustomStringConvertible {
     public func stateAt(coordinate: Coordinate) -> Int {
         guard isValidCoordinate(coordinate),
               let value = states[coordinate] else {
-            return stateEmpty
+            return stateInvalid
         }
         return value
     }
@@ -185,7 +191,7 @@ public struct GridGame: Codable, CustomStringConvertible {
     }
 
     /// get a state in a position one unit away in a given direction
-    public func state(inDirection: Direction, fromX x: Int, andY y: Int) -> Int? {
+    public func state(inDirection: Direction, fromX x: Int, andY y: Int) -> Int {
         switch inDirection {
         case .up:
             return stateAt(x: x, y: y-1)
@@ -210,6 +216,20 @@ public struct GridGame: Codable, CustomStringConvertible {
     public func isEmptyAt(x: Int, y: Int) -> Bool {
         let coordinate = Coordinate(x: x, y: y)
         return isEmptyAt(coordinate: coordinate)
+    }
+
+    // MARK: isValid
+
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
+    public func isValidAt(coordinate: Coordinate) -> Bool {
+        guard let state = states[coordinate] else { return false }
+        return state != stateInvalid
+    }
+
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
+    public func isValidAt(x: Int, y: Int) -> Bool {
+        let coordinate = Coordinate(x: x, y: y)
+        return isValidAt(coordinate: coordinate)
     }
 
     // MARK: index point coordinate conversion

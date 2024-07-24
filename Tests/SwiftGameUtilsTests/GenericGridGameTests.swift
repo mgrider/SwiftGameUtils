@@ -17,7 +17,7 @@ final class GenericGridGameTests: XCTestCase {
         super.setUp()
         subject = GenericGridGame<GridState>(
             stateDefault: .first,
-            stateEmpty: .empty,
+            stateInvalid: .empty,
             statesPossibleRandom: [.second, .third]
         )
     }
@@ -112,9 +112,9 @@ final class GenericGridGameTests: XCTestCase {
             XCTAssertTrue(subject.stateAt(index: i) != .none)
             XCTAssertTrue(subject.stateAt(index: i) != .empty)
             XCTAssertTrue(subject.stateAt(index: i) != .first)
-            XCTAssertTrue(subject.states.values.contains(.second))
-            XCTAssertTrue(subject.states.values.contains(.third))
         }
+        XCTAssertTrue(subject.states.values.contains(.second))
+        XCTAssertTrue(subject.states.values.contains(.third))
     }
 
     func testIndexForCoordinate() {

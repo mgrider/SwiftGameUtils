@@ -24,10 +24,15 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     public var stateDefault: StateType
 
     /// The value representing an empty game state
-    /// Note that this cannot be nil. Use `isValidCoordinate()` to check for out-of-bounds coordinates.
+    /// This will be the same as `stateDefault` unless set explicitly.
     public var stateEmpty: StateType
 
-    /// game states are between `0` and `stateMax`. This is really used for random state generation.
+    /// The value representing an invalid game state
+    /// See `isValidCoordinate()` to check for out-of-bounds coordinates, but this will also
+    /// be returned from the various `stateAt` functions when an OOB coordinate is asked for.
+    public var stateInvalid: StateType
+
+    /// random game states will be ones from this array
     public var statesPossibleRandom: [StateType]
 
     /// A dictionary representing the state of each grid space
@@ -71,14 +76,20 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
         gridWidth: Int = 8,
         gridHeight: Int = 8,
         stateDefault: StateType,
-        stateEmpty: StateType,
+        stateEmpty: StateType? = nil,
+        stateInvalid: StateType,
         statesPossibleRandom: [StateType],
         startDate: Date = Date()
     ) {
         self.gridWidth = gridWidth
         self.gridHeight = gridHeight
         self.stateDefault = stateDefault
-        self.stateEmpty = stateEmpty
+        if let stateEmpty {
+            self.stateEmpty = stateEmpty
+        } else {
+            self.stateEmpty = stateDefault
+        }
+        self.stateInvalid = stateInvalid
         self.statesPossibleRandom = statesPossibleRandom
         self.gameStartDate = startDate
         setupGrid()
@@ -170,7 +181,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     public func stateAt(coordinate: Coordinate) -> StateType {
         guard isValidCoordinate(coordinate),
               let value = states[coordinate] else {
-            return stateEmpty
+            return stateInvalid
         }
         return value
     }
@@ -212,6 +223,20 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     public func isEmptyAt(x: Int, y: Int) -> Bool {
         let coordinate = Coordinate(x: x, y: y)
         return isEmptyAt(coordinate: coordinate)
+    }
+
+    // MARK: isValid
+
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
+    public func isValidAt(coordinate: Coordinate) -> Bool {
+        guard let state = states[coordinate] else { return false }
+        return state != stateInvalid
+    }
+
+    /// Note that this returns false if the coordinate is out of bounds. Use `isValidCoordinate` for bounds checking.
+    public func isValidAt(x: Int, y: Int) -> Bool {
+        let coordinate = Coordinate(x: x, y: y)
+        return isValidAt(coordinate: coordinate)
     }
 
     // MARK: index point coordinate conversion
