@@ -1,25 +1,39 @@
 import Foundation
 
-public struct Tetromino {
+/// A class to handle Tetromino rotations and positions
+public struct Tetromino: Hashable, Equatable, Codable {
 
-    public enum Shape: Int {
+    public enum Shape: Int, Hashable, Equatable, Codable {
         case J, L, T, I, Z, S, O, None
+        public static var allShapes: [Shape] {
+            return [.J, .L, .T, .I, .Z, .S, .O]
+        }
         public static func random() -> Shape {
-            return [.J, .L, .T, .I, .Z, .S, .O][Int.random(in: 0..<7)]
+            let range = 0..<6
+            let index = Int.random(in: range)
+            return Tetromino.Shape.allShapes[index]
         }
     }
     public var shape: Shape
 
-    public enum Rotation: Int {
+    public enum Rotation: Int, Hashable, Equatable, Codable {
         case r0, r1, r2, r3
+        public static func fromCount(_ count: Int) -> Rotation {
+            guard let rotation = Rotation(rawValue: count) else {
+                return .r0
+            }
+            return rotation
+        }
     }
     public var rotation: Rotation = .r0
     public var rotationCount: Int {
         return rotation.rawValue
     }
+    public var rotationNextCount: Int {
+        return rotationCount == 3 ? 0 : rotationCount + 1
+    }
 
-    /// positions relative to 0x0 at lower left
-    public struct Coordinates: Equatable, Codable {
+    public struct Coordinates: Hashable, Equatable, Codable {
         public var a: Coordinate
         public var b: Coordinate
         public var c: Coordinate
@@ -45,6 +59,9 @@ public struct Tetromino {
             self.b = .init(x: bx, y: by)
             self.c = .init(x: cx, y: cy)
             self.d = .init(x: dx, y: dy)
+        }
+        public var allCoordinates: [Coordinate] {
+            [a, b, c, d]
         }
         public func contains(coord: Coordinate) -> Bool {
             if (a == coord || b == coord || c == coord || d == coord) {
@@ -72,15 +89,47 @@ public struct Tetromino {
     }
     public var position: Coordinates
 
+    // MARK: init
+
     init(
         shape: Shape,
         rotation: Rotation = .r0,
-        position: Coordinates
+        position: Coordinates? = nil
     ) {
         self.shape = shape
         self.rotation = rotation
-        self.position = position
+        if let position {
+            self.position = position
+        } else {
+            self.position = Tetromino.coordinatesForTypeAndRotation(shape, rotation.rawValue)
+        }
     }
+
+    /// Use this to initialize a Tetromino whose values are uninitialized. It's type will be `.none`.
+    public static func none() -> Tetromino {
+        return Tetromino(shape: .None)
+    }
+
+    /// Initialize a Tetromino with a random shape.
+    public static func random() -> Tetromino {
+        return Tetromino(shape: Tetromino.Shape.random())
+    }
+
+    // MARK: mutating instance functions
+
+    /// This rotates the Tetromino clockwise
+    public mutating func rotate() {
+        let newRotationCount = rotationNextCount
+        position = Tetromino.rotateCoordinates(
+            coordinate: position,
+            shape: shape,
+            originalRotation: rotationCount,
+            newRotation: newRotationCount
+        )
+        rotation = Rotation.fromCount(newRotationCount)
+    }
+
+    // MARK: static coordinates and rotation
 
     public static func coordinatesForTypeAndRotation(_ s: Shape, _ rotation: Int) ->  Coordinates {
         return Tetromino.coordinatesForTypeAndRotationWhileCentered(s, rotation)
@@ -332,9 +381,5 @@ public struct Tetromino {
             return Coordinate.zero
         }
     }
-
-//    public static func randomShape() -> Tetromino.Shape {
-//        return (Tetromino.Shape)Random.Range((int)0,(int)Shape.None);
-//    }
 
 }
