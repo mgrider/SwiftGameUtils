@@ -8,15 +8,34 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     // MARK: convenience properties
 
     /// Whether or not the game is over.
-    public var isOver = false
+    public var isOver = false {
+        willSet {
+            if !isOver, newValue {
+                timeDuration = Date().timeIntervalSince(timeStartDate)
+            }
+        }
+    }
 
     /// Whether or not the game is paused.
-    public var isPaused = false
+    public var isPaused = false {
+        didSet {
+            if isPaused {
+                timeDuration = Date().timeIntervalSince(timeStartDate)
+            } else {
+                timeStartDate = Date(timeInterval: -timeDuration, since: Date())
+            }
+        }
+    }
 
-    // MARK: Date & time & game duration (TODO)
+    // MARK: Dates & times
+
+    /// The game's duration, or `TimeInterval`.
+    ///
+    /// Note that this is not updated while the game is in progress, but only on change of `isOver` or `isPaused`.
+    public var timeDuration: TimeInterval = 0
 
     /// The start `Date` of the game.
-    var gameStartDate: Date
+    private(set) var timeStartDate: Date
 
     // MARK: state properties
 
@@ -91,7 +110,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
         }
         self.stateInvalid = stateInvalid
         self.statesPossibleRandom = statesPossibleRandom
-        self.gameStartDate = startDate
+        self.timeStartDate = startDate
         setupGrid()
     }
 
