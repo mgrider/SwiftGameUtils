@@ -11,7 +11,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     public var isOver = false {
         willSet {
             if !isOver, newValue {
-                timeDuration = Date().timeIntervalSince(timeStartDate)
+                timeDurationUpdate()
             }
         }
     }
@@ -20,7 +20,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     public var isPaused = false {
         didSet {
             if isPaused {
-                timeDuration = Date().timeIntervalSince(timeStartDate)
+                timeDurationUpdate()
             } else {
                 timeStartDate = Date(timeInterval: -timeDuration, since: Date())
             }
@@ -31,11 +31,17 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     /// The game's duration, or `TimeInterval`.
     ///
-    /// Note that this is not updated while the game is in progress, but only on change of `isOver` or `isPaused`.
+    /// Note that this value is only updated under the following circumstances:
+    /// - when `isOver` or `isPaused` are changed
+    /// - when `timeDurationUpdate()` is called
     public var timeDuration: TimeInterval = 0
 
     /// The start `Date` of the game.
-    private(set) var timeStartDate: Date
+    public private(set) var timeStartDate: Date
+
+    mutating public func timeDurationUpdate() {
+        timeDuration = Date().timeIntervalSince(timeStartDate)
+    }
 
     // MARK: state properties
 
