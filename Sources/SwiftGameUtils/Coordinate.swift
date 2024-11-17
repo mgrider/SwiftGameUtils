@@ -16,6 +16,10 @@ public struct Coordinate: CoordinateProtocol {
         self.y = y
     }
 
+    public init(inDirection direction: Direction) {
+        self = direction.offset()
+    }
+
     /// Implementing Hashable protocol
     public func hash(into hasher: inout Hasher) {
         hasher.combine(x)

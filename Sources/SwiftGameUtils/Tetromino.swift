@@ -1,6 +1,6 @@
 import Foundation
 
-/// A class to handle Tetromino rotations and positions
+/// A structure to handle Tetromino rotations and positions
 public struct Tetromino: Hashable, Equatable, Codable {
 
     public enum Shape: Int, Hashable, Equatable, Codable {

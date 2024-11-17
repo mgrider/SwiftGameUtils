@@ -186,16 +186,24 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     // MARK: randomization
 
-    /// get a random state from the initially provided array
-    public func randomStateInt() -> StateType {
+    /// get a random state from the array stored in `statesPossibleRandom`.
+    ///
+    /// TODO: make this use a predictable randomizer (maybe one that conforms to `RandomNumberGenerator`)
+    ///
+    public func randomState() -> StateType {
         return statesPossibleRandom[Int.random(in: 0..<statesPossibleRandom.count)]
     }
 
-    /// completely randomize the grid states with random values
+    /// randomize a single state from the states stored in `statesPossibleRandom`.
+    mutating public func randomizeState(at coordinate: Coordinate) {
+        states[coordinate] = randomState()
+    }
+
+    /// completely randomize the grid states with random values stored in `statesPossibleRandom`.
     mutating public func randomizeStates() {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
-                states[Coordinate(x: x, y: y)] = randomStateInt()
+                states[Coordinate(x: x, y: y)] = randomState()
             }
         }
     }
