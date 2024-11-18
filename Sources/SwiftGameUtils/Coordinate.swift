@@ -20,19 +20,31 @@ public struct Coordinate: CoordinateProtocol {
         self = direction.offset()
     }
 
-    /// Implementing Hashable protocol
+    public func reverseY() -> Coordinate {
+        return Coordinate(x: x, y: -y)
+    }
+
+    // MARK: Hashable
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(x)
         hasher.combine(y)
     }
 
-    /// Implementing Equatable protocol
+    // MARK: Equatable
+
     public static func == (lhs: Coordinate, rhs: Coordinate) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
 
+    // MARK: static modifiers
+
     public static func +(lhs: Coordinate, rhs: Coordinate) -> Coordinate {
         return Coordinate(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
+    }
+
+    public static func reverseY(_ coordinate: Coordinate) -> Coordinate {
+        return Coordinate(x: coordinate.x, y: -coordinate.y)
     }
 
     public static var zero: Coordinate { return Coordinate() }

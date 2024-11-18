@@ -191,17 +191,22 @@ public struct GridGame: Codable, CustomStringConvertible {
     }
 
     /// get a state in a position one unit away in a given direction
-    public func state(inDirection: Direction, fromX x: Int, andY y: Int) -> Int {
-        switch inDirection {
-        case .up:
-            return stateAt(x: x, y: y-1)
-        case .down:
-            return stateAt(x: x, y: y+1)
-        case .left:
-            return stateAt(x: x-1, y: y)
-        case .right:
-            return stateAt(x: x+1, y: y)
-        }
+    public func state(
+        inDirection direction: Direction,
+        fromCoordinate coordinate: Coordinate
+    ) -> Int {
+        let directionCoordinate = coordinate + Coordinate(inDirection: direction)
+        return stateAt(coordinate: directionCoordinate)
+    }
+
+    /// get a state in a position one unit away in a given direction
+    public func state(
+        inDirection direction: Direction,
+        fromX x: Int,
+        andY y: Int
+    ) -> Int {
+        let coordinate = Coordinate(x: x, y: y)
+        return state(inDirection: direction, fromCoordinate: coordinate)
     }
 
     // MARK: isEmpty

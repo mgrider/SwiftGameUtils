@@ -30,26 +30,28 @@ public enum Direction: CaseIterable {
     public static let diagonalOffsets: [Coordinate] = Direction.diagonal.map { $0.offset() }
 
     /// A static function that returns a `Coordinate` offset in the given `Direction`.
+    ///
+    /// Note that an `.up` offset is assumed to be negative `y`.
     public static func offset(
         from direction: Direction
     ) -> Coordinate {
         switch direction {
         case .down:
-            return Coordinate(x: 0, y: -1)
+            return Coordinate(x: 0, y: 1)
         case .downLeft:
-            return Coordinate(x: -1, y: -1)
+            return Coordinate(x: -1, y: 1)
         case .downRight:
-            return Coordinate(x: 1, y: -1)
+            return Coordinate(x: 1, y: 1)
         case .left:
             return Coordinate(x: -1, y: 0)
         case .right:
             return Coordinate(x: 1, y: 0)
         case .up:
-            return Coordinate(x: 0, y: 1)
+            return Coordinate(x: 0, y: -1)
         case .upLeft:
-            return Coordinate(x: -1, y: 1)
+            return Coordinate(x: -1, y: -1)
         case .upRight:
-            return Coordinate(x: 1, y: 1)
+            return Coordinate(x: 1, y: -1)
         }
     }
 

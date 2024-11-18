@@ -147,21 +147,26 @@ final class GenericGridGameTests: XCTestCase {
     }
 
     func testToString() {
-        guard let subject else {
+        guard var subject else {
             XCTFail()
             return
         }
+        subject.setAllStates(to: .empty)
+        subject.setState(atIndex: 9, to: .first)
+        subject.setState(atCoordinate: .init(x: 3, y: 3), to: .second)
+        subject.setState(atCoordinate: .init(x: 5, y: 5), to: .third)
         let gameString = "\(subject)"
         let result = """
 GenericGridGame(GenericGridGame<GridState>)
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
-fi, fi, fi, fi, fi, fi, fi, fi, 
+    0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 
+0 : em, em, em, em, em, em, em, em, 
+1 : em, fi, em, em, em, em, em, em, 
+2 : em, em, em, em, em, em, em, em, 
+3 : em, em, em, se, em, em, em, em, 
+4 : em, em, em, em, em, em, em, em, 
+5 : em, em, em, em, em, th, em, em, 
+6 : em, em, em, em, em, em, em, em, 
+7 : em, em, em, em, em, em, em, em, 
 Game Over: false, Paused: false
 """
         XCTAssertEqual(gameString, "\(result)")

@@ -103,7 +103,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
         stateDefault: StateType,
         stateEmpty: StateType? = nil,
         stateInvalid: StateType,
-        statesPossibleRandom: [StateType],
+        statesPossibleRandom: [StateType]? = nil,
         startDate: Date = Date()
     ) {
         self.gridWidth = gridWidth
@@ -115,7 +115,11 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
             self.stateEmpty = stateDefault
         }
         self.stateInvalid = stateInvalid
-        self.statesPossibleRandom = statesPossibleRandom
+        if let statesPossibleRandom {
+            self.statesPossibleRandom = statesPossibleRandom
+        } else {
+            self.statesPossibleRandom = [stateDefault]
+        }
         self.timeStartDate = startDate
         setupGrid()
     }
@@ -230,18 +234,39 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
         return stateAt(coordinate: coordinate)
     }
 
-    /// get a state in a position one unit away in a given direction
-    public func state(inDirection: Direction, fromX x: Int, andY y: Int) -> StateType {
-        switch inDirection {
-        case .up:
-            return stateAt(x: x, y: y-1)
-        case .down:
-            return stateAt(x: x, y: y+1)
-        case .left:
-            return stateAt(x: x-1, y: y)
-        case .right:
-            return stateAt(x: x+1, y: y)
+    /// Get a state in a position one unit away in a given direction.
+    ///
+    /// Note that this assumes origin (0x0) is upper-left, so a direction of `.down` has a `Coordinate`
+    /// value of `y + 1`. (This is how the default, and how the grid is printed in `.toString()`, and
+    /// how it's drawn using the `UIKit` subclasses.)
+    public func stateInDirection(
+        _ direction: Direction,
+        from coordinate: Coordinate,
+        positiveYIsDown: Bool = true
+    ) -> StateType {
+        if positiveYIsDown {
+            let directionCoordinate = coordinate + Coordinate(inDirection: direction)
+            print("dir: \(direction), coord: \(coordinate), dirCoord: \(directionCoordinate)")
+            return stateAt(coordinate: directionCoordinate)
+        } else {
+            let directionCoordinate = coordinate + Coordinate(inDirection: direction).reverseY()
+            return stateAt(coordinate: directionCoordinate)
         }
+    }
+
+    /// Get a state in a position one unit away in the given direction.
+    ///
+    /// Note that this assumes origin (0x0) is upper-left, so a direction of `.down` has a `Coordinate`
+    /// value of `y + 1`. (This is how the default, and how the grid is printed in `.toString()`, and
+    /// how it's drawn using the `UIKit` subclasses.)
+    public func state(
+        inDirection direction: Direction,
+        fromX x: Int,
+        andY y: Int,
+        positiveYIsDown: Bool = true
+    ) -> StateType {
+        let coordinate = Coordinate(x: x, y: y)
+        return stateInDirection(direction, from: coordinate, positiveYIsDown: positiveYIsDown)
     }
 
     // MARK: isEmpty
@@ -304,8 +329,13 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
 
     /// `toString` for debugging
     func toString() -> String {
-        var string = "GenericGridGame(\(type(of: self)))\n"
+        var string = "GenericGridGame(\(type(of: self)))\n    "
+        for x in 0..<gridWidth {
+            string += "\(String(describing: x).padding(toLength: 2, withPad: " ", startingAt: 0)), "
+        }
+        string += "\n"
         for y in 0..<gridHeight {
+            string += "\(String(describing: y).padding(toLength: 2, withPad: " ", startingAt: 0)): "
             for x in 0..<gridWidth {
                 let state = stateAt(x: x, y: y)
                 string += "\(String(describing: state).padding(toLength: 2, withPad: " ", startingAt: 0)), "
