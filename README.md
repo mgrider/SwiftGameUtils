@@ -16,7 +16,6 @@ For now, use at your own risk.
 - [ ] some examples
 - [ ] getting started instructions
 - [ ] documentation
-- [ ] add a License
 - [ ] version 0.1
 
 ## Author
@@ -32,6 +31,7 @@ Once upon a time, many of these same concepts existed in an Objective-C package 
 - [x] added `UIView` subclasses
     (Feature parity with the original GGM? Not quite, I guess.)
 - [x] added `Chess.swift`
+- [x] added a [License](LICENSE), Creative Commons
 
 ### summer 2024
 
