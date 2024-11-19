@@ -2,8 +2,8 @@ import Foundation
 
 public protocol GenericGridGameStateProtocol : Hashable, Codable, Equatable { }
 
-/// Model struct for game state data.
-public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, CustomStringConvertible {
+/// Model class for game state data.
+public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, CustomStringConvertible {
 
     // MARK: convenience properties
 
@@ -39,7 +39,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     /// The start `Date` of the game.
     public private(set) var timeStartDate: Date
 
-    mutating public func timeDurationUpdate() {
+    public func timeDurationUpdate() {
         timeDuration = Date().timeIntervalSince(timeStartDate)
     }
 
@@ -125,7 +125,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     }
 
     /// This re-creates the "grid", which is essentially the multidimensional state array. Called on init.
-    mutating private func setupGrid() {
+    private func setupGrid() {
         states.removeAll()
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
@@ -136,7 +136,7 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     }
 
     /// This creates a new grid, copying over old state values when possible.
-    mutating private func resizeGrid() {
+    private func resizeGrid() {
         let oldStates = states
         setupGrid()
         for coordinate in oldStates.keys {
@@ -159,12 +159,12 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     // MARK: setting state
 
     /// set a single state when x and y are known
-    mutating public func setState(atX x: Int, andY y: Int, to state: StateType) {
+    public func setState(atX x: Int, andY y: Int, to state: StateType) {
         setState(atCoordinate: Coordinate(x: x, y: y), to: state)
     }
 
     /// set a single state at a given Coordinate
-    mutating public func setState(atCoordinate coordinate: Coordinate, to state: StateType) {
+    public func setState(atCoordinate coordinate: Coordinate, to state: StateType) {
         guard coordinate.x >= 0,
               coordinate.x < gridWidth,
               coordinate.y >= 0,
@@ -175,12 +175,12 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     }
 
     /// set a single state when only the index is known
-    mutating public func setState(atIndex index: Int, to state: StateType) {
+    public func setState(atIndex index: Int, to state: StateType) {
         setState(atCoordinate: coordinateFor(index: index), to: state)
     }
 
     /// set all states to this new value
-    mutating public func setAllStates(to state: StateType) {
+    public func setAllStates(to state: StateType) {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
                 states[Coordinate(x: x, y: y)] = state
@@ -199,12 +199,12 @@ public struct GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable,
     }
 
     /// randomize a single state from the states stored in `statesPossibleRandom`.
-    mutating public func randomizeState(at coordinate: Coordinate) {
+    public func randomizeState(at coordinate: Coordinate) {
         states[coordinate] = randomState()
     }
 
     /// completely randomize the grid states with random values stored in `statesPossibleRandom`.
-    mutating public func randomizeStates() {
+    public func randomizeStates() {
         for y in 0..<gridHeight {
             for x in 0..<gridWidth {
                 states[Coordinate(x: x, y: y)] = randomState()
