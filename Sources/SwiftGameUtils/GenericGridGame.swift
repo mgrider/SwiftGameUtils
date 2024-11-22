@@ -94,6 +94,11 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
         return keys
     }
 
+    /// computed property for all the values contained in states
+    public var allValues: [StateType] {
+        states.map { $0.value }
+    }
+
     // MARK: Initializers & setup
 
     /// Initializer
@@ -148,12 +153,18 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
 
     // MARK: checking for valid coordinates
 
-    /// returns whether the given coordinate is within the bounds of our `gridWidth` and `gridHeight`
+    /// Returns whether the given coordinate is within the bounds of our `gridWidth` and `gridHeight`.
     public func isValidCoordinate(_ coordinate: Coordinate) -> Bool {
         return coordinate.x >= 0 &&
         coordinate.x < gridWidth &&
         coordinate.y >= 0 &&
         coordinate.y < gridHeight
+    }
+
+    /// Returns whether or not the given coordinate is within the bounds of our grid,
+    /// AND the state found at that coordinate is NOT the `invalidState` value.
+    public func isValidState(at coordinate: Coordinate) -> Bool {
+        return stateAt(coordinate: coordinate) != stateInvalid
     }
 
     // MARK: setting state
@@ -354,4 +365,15 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
     }
 }
 
-
+extension GenericGridGame: Equatable {
+    public static func == (lhs: GenericGridGame<StateType>, rhs: GenericGridGame<StateType>) -> Bool {
+        guard lhs.allCoordinates == rhs.allCoordinates else { return false }
+        guard lhs.allValues == rhs.allValues else { return false }
+        guard lhs.isOver == rhs.isOver else { return false }
+        guard lhs.isPaused == rhs.isPaused else { return false }
+        guard lhs.stateDefault == rhs.stateDefault else { return false }
+        guard lhs.stateEmpty == rhs.stateEmpty else { return false }
+        guard lhs.timeStartDate == rhs.timeStartDate else { return false }
+        return true
+    }
+}
