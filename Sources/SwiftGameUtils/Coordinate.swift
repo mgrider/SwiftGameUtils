@@ -48,6 +48,15 @@ public struct Coordinate: CoordinateProtocol {
         lhs.y += rhs.y
     }
 
+    public static func -(lhs: Coordinate, rhs: Coordinate) -> Coordinate {
+        return Coordinate(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
+    }
+
+    public static func -=(lhs: inout Coordinate, rhs: Coordinate) {
+        lhs.x -= rhs.x
+        lhs.y -= rhs.y
+    }
+
     public static func reverseY(_ coordinate: Coordinate) -> Coordinate {
         return Coordinate(x: coordinate.x, y: -coordinate.y)
     }

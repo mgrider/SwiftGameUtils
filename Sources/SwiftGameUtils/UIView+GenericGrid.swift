@@ -33,8 +33,18 @@ public protocol GenericGridStateUIViewProtocol: UIView {
         inGrid grid: GenericGridGame<StateType>
     )
 
-    func setupView(
-        forState state: StateType,
+    /// This function has the responsibility to represent the state to the user.
+    func updateView(
+        withState state: StateType,
+        atCoordinate coordinate: Coordinate,
+        inGrid grid: GenericGridGame<StateType>
+    )
+
+    /// This function gets called whenever the grid needs to reposition the `UIView`. The grid
+    /// never sets the position directly, but instead calls this function. The simplest implementation would
+    /// be to set the view's `frame` property to the `position` argument.
+    func updateView(
+        withPosition position: CGRect,
         atCoordinate coordinate: Coordinate,
         inGrid grid: GenericGridGame<StateType>
     )
@@ -138,14 +148,15 @@ open class UIViewGenericGrid<ViewType: GenericGridStateUIViewProtocol>:
         case .fixed, .rectangle, .square:
             let point = pointForCoordinate(coordinate)
             let size = CGSize(width: gridPixelWidth, height: gridPixelHeight)
-            view.frame = .init(origin: point, size: size)
+            let position = CGRect(origin: point, size: size)
+            view.updateView(withPosition: position, atCoordinate: coordinate, inGrid: genericGridGame)
         }
     }
 
     public func refreshViewState(at coordinate: Coordinate) {
         guard let view = gridViews[coordinate] else { return }
         let state = genericGridGame.stateAt(coordinate: coordinate)
-        view.setupView(forState: state, atCoordinate: coordinate, inGrid: genericGridGame)
+        view.updateView(withState: state, atCoordinate: coordinate, inGrid: genericGridGame)
     }
 
     // MARK: GenericGameGridUIViewInteractionProtocol
