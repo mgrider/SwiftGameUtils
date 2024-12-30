@@ -3,6 +3,8 @@ import Foundation
 public protocol GenericGridGameStateProtocol : Hashable, Codable, Equatable { }
 
 /// Model class for game state data.
+///
+/// Note if you deserialize this, you should probably call `timeStartDateSetFromDuration()` immediately after.
 public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, CustomStringConvertible {
 
     // MARK: convenience properties
@@ -11,7 +13,7 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
     public var isOver = false {
         willSet {
             if !isOver, newValue {
-                timeDurationUpdate()
+                timeDurationSetFromStartDate()
             }
         }
     }
@@ -20,27 +22,33 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
     public var isPaused = false {
         didSet {
             if isPaused {
-                timeDurationUpdate()
+                timeDurationSetFromStartDate()
             } else {
-                timeStartDate = Date(timeInterval: -timeDuration, since: Date())
+                timeStartDateSetFromDuration()
             }
         }
     }
 
     // MARK: Dates & times
 
-    /// The game's duration, or `TimeInterval`.
+    /// The game's duration, as a `TimeInterval`.
     ///
-    /// Note that this value is only updated under the following circumstances:
+    /// Note that this value is automatically updated under the following circumstances:
     /// - when `isOver` or `isPaused` are changed
-    /// - when `timeDurationUpdate()` is called
+    /// - when `timeDurationSetFromStartDate()` is called
     public var timeDuration: TimeInterval = 0
+
+    /// Sets the `timeDuration` property based on the `timeStartDate`.
+    public func timeDurationSetFromStartDate() {
+        timeDuration = Date().timeIntervalSince(timeStartDate)
+    }
 
     /// The start `Date` of the game.
     public private(set) var timeStartDate: Date
 
-    public func timeDurationUpdate() {
-        timeDuration = Date().timeIntervalSince(timeStartDate)
+    /// Sets the `timeStartDate` property from the `timeDuration`.
+    public func timeStartDateSetFromDuration() {
+        timeStartDate = Date(timeInterval: -timeDuration, since: Date())
     }
 
     // MARK: state properties
@@ -109,7 +117,8 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
         stateEmpty: StateType? = nil,
         stateInvalid: StateType,
         statesPossibleRandom: [StateType]? = nil,
-        startDate: Date = Date()
+        timeDuration: TimeInterval? = nil,
+        timeStartDate: Date? = nil
     ) {
         self.gridWidth = gridWidth
         self.gridHeight = gridHeight
@@ -125,7 +134,16 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
         } else {
             self.statesPossibleRandom = [stateDefault]
         }
-        self.timeStartDate = startDate
+        if let timeDuration {
+            self.timeDuration = timeDuration
+            // note that this is the equivalent to timeStartDateSetFromDuration()
+            self.timeStartDate = Date(timeInterval: -timeDuration, since: Date())
+        } else if let timeStartDate {
+            self.timeStartDate = timeStartDate
+            timeDurationSetFromStartDate()
+        } else {
+            self.timeStartDate = Date()
+        }
         setupGrid()
     }
 
