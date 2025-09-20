@@ -1,15 +1,18 @@
 # SwiftGameUtils
 
-This is just a swift package containing a collection of classes I've found useful in various projects.
+This is just a swift package containing a collection of classes and structures I've found useful in various projects.
 
-For now, use at your own risk.
+There are some tests you might use as examples, but for now, use at your own risk.
+
+As of this writing, all "grids" are square grids.
 
 ## Contents
 
-- `GenericGameGrid` - This is the meat and potatoes of this package, basically a way to hold a multidimensional array of state objects. (Note that, if you don't need complex state, `GridGame` assumes state is an `Int`. Warning that it might be removed in favor of `GenericGridGame<Int>`, which should be functionally identical.)
-- Most other structures in this package (`Coordinate` and `Direction` in particular) only exist to reference/access states in the `GenricGameGrid`.
-- `Chess` and `Tetromino` - These are simple structures meant to represent some relative grid movement.
-- `UIView+GenericGrid.swift` and `UIView+GenericGridInteraction.swift` – These files contain `UIView` subclasses specifically tailored to represent a `GenericGameGrid`.
+- `GenericGridGame` - This is the meat and potatoes of this package, basically a generic class meant to hold a multidimensional array of state structures. Meant to represent a game's model. (Note that, `GridGame` is a non-generic class that does the same thing, but assumes that your state is an `Int`. Warning that it might eventually be removed in favor of `GenericGridGame<Int>`, which should be functionally identical.)
+- `Coordinate` is a struct with `x` and `y` properties that is heavily used the API.
+- `Direction` is an enumeration of the 8 grid-spaces around a given coordinate.
+- `Chess` and `Tetromino` - These are some structures meant to represent common grid movement or relative relationships between grid coordinates.
+- `UIView+GenericGrid.swift` and `UIView+GenericGridInteraction.swift` – These files contain `UIView` subclasses specifically tailored to represent a `GenericGridGame`.
 
 ## TODO
 
@@ -22,9 +25,7 @@ For now, use at your own risk.
 
 This is almost entirely the product of [Martin Grider](https://github.com/mgrider) futzing around.
 
-## History
-
-Once upon a time, many of these same concepts existed in an Objective-C package called [GenericGameModel](https://github.com/mgrider/GenericGameModel).
+## Rough History / Log
 
 ### fall 2024
 
@@ -49,3 +50,7 @@ A project called [EasyGameView](https://github.com/mgrider/EasyGameView) took so
 ### summer 2021
 
 [GGMSwift](https://github.com/mgrider/GGMSwift) was created to (naively) port GGM to Swift.
+
+### prior to this timeline
+
+Once upon a time, many of these same concepts existed in an Objective-C package called [GenericGameModel](https://github.com/mgrider/GenericGameModel).
