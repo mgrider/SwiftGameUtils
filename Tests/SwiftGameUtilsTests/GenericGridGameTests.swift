@@ -147,7 +147,7 @@ final class GenericGridGameTests: XCTestCase {
     }
 
     func testToString() {
-        guard var subject else {
+        guard let subject else {
             XCTFail()
             return
         }

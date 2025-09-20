@@ -8,11 +8,13 @@ As of this writing, all "grids" are square grids.
 
 ## Contents
 
-- `GenericGridGame` - This is the meat and potatoes of this package, basically a generic class meant to hold a multidimensional array of state structures. Meant to represent a game's model. (Note that, `GridGame` is a non-generic class that does the same thing, but assumes that your state is an `Int`. Warning that it might eventually be removed in favor of `GenericGridGame<Int>`, which should be functionally identical.)
-- `Coordinate` is a struct with `x` and `y` properties that is heavily used the API.
+- `GenericGridGame` - This is the meat and potatoes of this package, basically a generic class meant to hold a multidimensional array of state structures representing a game's "model". (Note that, `GridGame` is a non-generic class that does the same thing, but assumes that your state is an `Int`. Warning that it might eventually be removed in favor of `GenericGridGame<Int>`, which should be functionally identical.)
+- `Coordinate` is a struct with `x` and `y` properties that is heavily used throughout the API.
 - `Direction` is an enumeration of the 8 grid-spaces around a given coordinate.
 - `Chess` and `Tetromino` - These are some structures meant to represent common grid movement or relative relationships between grid coordinates.
 - `UIView+GenericGrid.swift` and `UIView+GenericGridInteraction.swift` – These files contain `UIView` subclasses specifically tailored to represent a `GenericGridGame`.
+
+Everything should have at least some doc comments. Hopefully they're useful.
 
 ## TODO
 

@@ -36,7 +36,7 @@ final class DirectionTests: XCTestCase {
     }
 
     func testLeft() {
-        print("\(subject.toString())")
+//        print("\(subject.toString())")
         XCTAssertEqual(subject.state(inDirection: .left, fromX: 0, andY: 0), -1)
         XCTAssertEqual(subject.state(inDirection: .left, fromX: 1, andY: 0), 0)
         XCTAssertEqual(subject.state(inDirection: .left, fromX: 2, andY: 0), 1)
@@ -44,7 +44,7 @@ final class DirectionTests: XCTestCase {
     }
 
     func testRight() {
-        print("\(subject.toString())")
+//        print("\(subject.toString())")
         XCTAssertEqual(subject.state(inDirection: .right, fromX: 0, andY: 0), 1)
         XCTAssertEqual(subject.state(inDirection: .right, fromX: 1, andY: 0), 2)
         XCTAssertEqual(subject.state(inDirection: .right, fromX: 2, andY: 0), 3)
@@ -88,7 +88,7 @@ final class DirectionTests: XCTestCase {
     }
 
     func testUpRight() {
-        print("\(subject.toString())")
+//        print("\(subject.toString())")
         XCTAssertEqual(subject.stateAt(x: 1, y: 0), 1)
         XCTAssertEqual(subject.stateAt(x: 1, y: 1), 9)
         XCTAssertEqual(subject.stateAt(x: 2, y: 2), 18)

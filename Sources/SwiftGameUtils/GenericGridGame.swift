@@ -275,7 +275,7 @@ public class GenericGridGame<StateType: GenericGridGameStateProtocol>: Codable, 
     ) -> StateType {
         if positiveYIsDown {
             let directionCoordinate = coordinate + Coordinate(inDirection: direction)
-            print("dir: \(direction), coord: \(coordinate), dirCoord: \(directionCoordinate)")
+//            print("dir: \(direction), coord: \(coordinate), dirCoord: \(directionCoordinate)")
             return stateAt(coordinate: directionCoordinate)
         } else {
             let directionCoordinate = coordinate + Coordinate(inDirection: direction).reverseY()
